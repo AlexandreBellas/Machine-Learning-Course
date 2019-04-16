@@ -57,14 +57,13 @@ def enhance_data(dataset):
 
     augmented_dataset = deepcopy(dataset)
     for person in augmented_dataset:
-        for i in range(9):
+        while len(person) < 10:
             # TODO Use better techniques of data augmentation
             # https://www.kaggle.com/tomahim/image-manipulation-augmentation-with-skimage
             img_noised = random_noise(person[0])
             person.append(img_as_uint(img_noised)) # use img_as_uint since random_noise return a float image
 
     return augmented_dataset
-
 
 
 def save_faces(dataset, path):
