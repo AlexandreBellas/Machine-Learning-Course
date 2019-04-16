@@ -1,4 +1,4 @@
-from dataset import get_faces
+from dataset import get_faces, enhance_data, save_faces
 from skimage import io
 
 
@@ -19,8 +19,21 @@ print(len(icmc_faces))
 
 for person in icmc_faces:
     print(len(person))
-    io.imshow(person[0])
-    io.show()
+    # io.imshow(person[0])
+    # io.show()
 
 # io.imshow(orl_faces[9][9])
 # io.show()
+
+augmented_icmc_faces = enhance_data(icmc_faces)
+print("ENHANCES ICMC FACES")
+print(len(icmc_faces))
+
+for person in augmented_icmc_faces:
+    print(len(person))
+    # for face in person:
+    #     io.imshow(face)
+    #     io.show()
+
+
+save_faces(augmented_icmc_faces , './datasets/Augmented')
