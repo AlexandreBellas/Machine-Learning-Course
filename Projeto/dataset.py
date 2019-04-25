@@ -5,8 +5,12 @@ import os.path
 
 from copy import deepcopy
 
-from skimage import data, io, filters
-from skimage.util import random_noise, img_as_uint
+import numpy as np
+from scipy import ndimage
+
+from skimage import data, io, filters, exposure
+from skimage.util import random_noise, img_as_uint, invert
+from skimage.transform import rotate
 
 from sys import platform as sys_pf
 if sys_pf == 'darwin':
@@ -60,8 +64,47 @@ def enhance_data(dataset):
         while len(person) < 10:
             # TODO Use better techniques of data augmentation
             # https://www.kaggle.com/tomahim/image-manipulation-augmentation-with-skimage
+
+            # Noise insertion
             img_noised = random_noise(person[0])
             person.append(img_as_uint(img_noised)) # use img_as_uint since random_noise return a float image
+
+            # Inversed colors
+            img_inversed = np.invert(person[0])
+            person.append(img_inversed)
+
+            # Rotation by 20 degrees backward
+            img_rotated_backward = rotate(person[0], 20)
+            person.append(img_rotated_backward)
+
+            # Rotation by 20 degrees forward
+            img_rotated_forward = rotate(person[0], -20)
+            person.append(img_rotated_forward)
+
+            # Constrast changed
+            v_min, v_max = np.percentile(person[0], (0.1, 50.0))
+            img_better_constrast = exposure.rescale_intensity(person[0], in_range=(v_min, v_max))
+            person.append(img_better_constrast)
+
+            # Logarithmic correction
+            img_log_correction = exposure.adjust_log(person[0])
+            person.append(img_log_correction)
+
+            # Sigmoid correction
+            img_sigmoid_correction = exposure.adjust_sigmoid(person[0])
+            person.append(img_sigmoid_correction)
+
+            # Horizontal flip
+            img_horizontal_flip = person[0][:, ::-1]    
+            person.append(img_horizontal_flip)
+
+            # Vertical flip
+            img_vertical_flip = person[0][::-1, :]    
+            person.append(img_vertical_flip)    
+
+            # Blur image => not working! There is a problem in the parameters of the function below...
+            #img_blured = ndimage.uniform_filter(person[0], size=(300, 200, 1))
+            #person.append(img_blured)
 
     return augmented_dataset
 
