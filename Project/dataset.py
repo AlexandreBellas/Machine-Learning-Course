@@ -18,6 +18,8 @@ if sys_pf == 'darwin':
     matplotlib.use("TkAgg")
 
 
+import matplotlib.pyplot as plt
+
 def print_data():
     print("Hello from dataset")
 

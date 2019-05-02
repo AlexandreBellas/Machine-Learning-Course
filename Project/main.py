@@ -1,4 +1,5 @@
 from dataset import get_faces, enhance_data, save_faces
+from features import get_hog
 from skimage import io
 
 
@@ -29,11 +30,14 @@ augmented_icmc_faces = enhance_data(icmc_faces)
 print("ENHANCES ICMC FACES")
 print(len(icmc_faces))
 
-for person in augmented_icmc_faces:
-    print(len(person))
+# for person in augmented_icmc_faces:
+#     print(len(person))
     # for face in person:
     #     io.imshow(face)
     #     io.show()
 
 
 save_faces(augmented_icmc_faces , './datasets/Augmented')
+
+# HOG
+get_hog(augmented_icmc_faces[0][4], print_hog=True)
