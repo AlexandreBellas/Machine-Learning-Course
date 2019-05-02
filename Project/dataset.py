@@ -12,11 +12,17 @@ from skimage import data, io, filters, exposure
 from skimage.util import random_noise, img_as_uint, invert
 from skimage.transform import rotate
 
+from skimage.feature import hog
+from skimage import data, exposure
+
+
 from sys import platform as sys_pf
 if sys_pf == 'darwin':
     import matplotlib
     matplotlib.use("TkAgg")
 
+
+import matplotlib.pyplot as plt
 
 def print_data():
     print("Hello from dataset")
@@ -136,3 +142,24 @@ def save_faces(dataset, path):
         for face, file_id in zip(person, range(1, len(person)+1)):
             image_path = os.path.join(person_path, str(file_id) + '.png')
             io.imsave(image_path, face)
+
+def get_hog(img):
+    print(img.shape)
+
+    # quanto menos pixelsn na celula não é melhor para capturar mais detalhes??!?!??!
+    fd, hog_image = hog(img, orientations=8, pixels_per_cell=(6, 6),
+                        cells_per_block=(2, 2), visualize=True, multichannel=False, block_norm='L2')
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
+
+    ax1.axis('off')
+    ax1.imshow(img, cmap=plt.cm.gray)
+    ax1.set_title('Input image')
+
+    # Rescale histogram for better display
+    hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0,1000))
+
+    ax2.axis('off')
+    ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
+    ax2.set_title('Histogram of Oriented Gradients')
+    plt.show()
