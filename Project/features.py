@@ -6,8 +6,57 @@ import matplotlib.pyplot as plt
 
 from skimage.feature import hog
 from skimage import data, exposure
+import numpy as np
 
 
+def get_dataset_hogs(dataset):
+    """
+    get_dataset_hogs gets the hog feature for each image in the dataset
+    :param dataset: the data set to be used. It must have the structure
+        [
+            [person_1_face1, person_1_face2, person_1_face3],
+            [person_2_face1, person_2_face2, person_2_face3],
+            [person_3_face1, person_3_face2, person_3_face3]
+
+        ]
+    :return: a slice of slices containing the feature hogs following the schema below
+        [
+            [person_1_face1_hog, person_1_face2_hog, person_1_face3_hog],
+            [person_2_face1_hog, person_2_face2_hog, person_2_face3_hog],
+            [person_3_face1_hog, person_3_face2_hog, person_3_face3_hog]
+
+        ]
+    """
+    return [[get_hog(img) for img in person] for person in dataset]
+
+
+def save_hogs_dataset(dataset, file):
+    """
+    save_hogs_dataset saves the hog vectors extracted from a database in the given file
+    :param dataset: a slice of slices containing the feature hogs following the schema below
+        [
+            [person_1_face1_hog, person_1_face2_hog, person_1_face3_hog],
+            [person_2_face1_hog, person_2_face2_hog, person_2_face3_hog],
+            [person_3_face1_hog, person_3_face2_hog, person_3_face3_hog]
+
+        ]
+    :param file: file to save the hog features
+    """
+    np.save(file, dataset)
+
+def read_hogs_dataset(file):
+    """
+    read_hog_dataset reads the hog features of a dataset from the given file
+    :param file: file to read the features from
+    :return: a slice of slices containing the feature hogs following the schema below
+        [
+            [person_1_face1_hog, person_1_face2_hog, person_1_face3_hog],
+            [person_2_face1_hog, person_2_face2_hog, person_2_face3_hog],
+            [person_3_face1_hog, person_3_face2_hog, person_3_face3_hog]
+
+        ]
+    """
+    return np.load(file)
 
 def get_hog(img, print_hog=False):
     """

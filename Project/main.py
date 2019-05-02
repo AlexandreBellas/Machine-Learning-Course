@@ -1,5 +1,7 @@
 from dataset import get_faces, enhance_data, save_faces
-from features import get_hog
+
+from features import get_hog, get_dataset_hogs, save_hogs_dataset, read_hogs_dataset
+
 from skimage import io
 
 
@@ -37,7 +39,19 @@ print(len(icmc_faces))
     #     io.show()
 
 
-save_faces(augmented_icmc_faces , './datasets/Augmented')
+save_faces(augmented_icmc_faces, './datasets/Augmented')
 
 # HOG
-get_hog(augmented_icmc_faces[0][4], print_hog=True)
+read_from_file = True
+if read_from_file:
+    icmc_hogs = read_hogs_dataset('icmc_hogs.npy')
+    orl_hogs = read_hogs_dataset('orl_hogs.npy')
+
+else:
+    icmc_hogs = get_dataset_hogs(augmented_icmc_faces)
+    save_hogs_dataset(icmc_hogs, 'icmc_hogs')
+
+    orl_hogs = get_dataset_hogs(orl_faces)
+    save_hogs_dataset(orl_hogs, 'orl_hogs')
+
+print("True")
