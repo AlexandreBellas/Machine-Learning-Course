@@ -102,6 +102,14 @@ def enhance_data(dataset):
             img_vertical_flip = person[0][::-1, :]    
             person.append(img_vertical_flip)    
 
+            # HOG data
+            fd, hog_image = hog(person[0], orientations=8, pixels_per_cell=(10, 10),
+                    cells_per_block=(1, 1), block_norm='L2-Hys', visualize=True)
+
+            # Rescale histogram for better display
+            hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(-100, 100))
+            person.append(hog_image_rescaled)
+
             # Blur image => not working! There is a problem in the parameters of the function below...
             #img_blured = ndimage.uniform_filter(person[0], size=(300, 200, 1))
             #person.append(img_blured)
