@@ -14,6 +14,8 @@ print(len(orl_faces))
 for person in orl_faces:
     print(len(person))
 
+#print(person)
+
 # io.imshow(orl_faces[9][9])
 # io.show()
 
