@@ -65,29 +65,29 @@ def enhance_data(dataset):
             # TODO Use better techniques of data augmentation
             # https://www.kaggle.com/tomahim/image-manipulation-augmentation-with-skimage
 
-            # Noise insertion
-            img_noised = random_noise(person[0])
-            person.append(img_as_uint(img_noised)) # use img_as_uint since random_noise return a float image
+            # Noise insertion => needed to convert to uint16 type for saving in a file
+            img_noised = random_noise(person[0], mode='pepper', amount=0.2)
+            img_noised = exposure.rescale_intensity(img_noised, in_range='image', out_range='uint16')
+            img_noised = img_noised.astype(np.uint16)
+            person.append(img_noised)
 
             # Inversed colors
             img_inversed = np.invert(person[0])
             person.append(img_inversed)
 
-            # Rotation by 20 degrees backward
-            img_rotated_backward = rotate(person[0], 20)
+            # Rotation by 20 degrees backward => needed to convert to uint16 type for saving in a file
+            img_rotated_backward = rotate(person[0], -20, mode='edge')
+            img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image', out_range='uint16')
+            img_rotated_backward = img_rotated_backward.astype(np.uint16)
             person.append(img_rotated_backward)
 
-            # Rotation by 20 degrees forward
-            img_rotated_forward = rotate(person[0], -20)
-            person.append(img_rotated_forward)
-
             # Constrast changed
-            v_min, v_max = np.percentile(person[0], (0.1, 50.0))
+            v_min, v_max = np.percentile(person[0], (0.1, 38.0))
             img_better_constrast = exposure.rescale_intensity(person[0], in_range=(v_min, v_max))
             person.append(img_better_constrast)
 
             # Logarithmic correction
-            img_log_correction = exposure.adjust_log(person[0])
+            img_log_correction = exposure.adjust_log(person[0], gain=1.1)
             person.append(img_log_correction)
 
             # Sigmoid correction
@@ -103,8 +103,8 @@ def enhance_data(dataset):
             person.append(img_vertical_flip)    
 
             # Blur image => not working! There is a problem in the parameters of the function below...
-            #img_blured = ndimage.uniform_filter(person[0], size=(300, 200, 1))
-            #person.append(img_blured)
+            img_blured = ndimage.uniform_filter(person[0], size=10)
+            person.append(img_blured)
 
     return augmented_dataset
 
