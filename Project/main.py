@@ -1,4 +1,5 @@
-from dataset import get_faces, enhance_data, save_faces, get_hog
+from dataset import get_faces, enhance_data, save_faces
+from features import get_hog
 from skimage import io
 
 
@@ -39,4 +40,4 @@ print(len(icmc_faces))
 save_faces(augmented_icmc_faces , './datasets/Augmented')
 
 # HOG
-get_hog(augmented_icmc_faces[0][4])
+get_hog(augmented_icmc_faces[0][4], print_hog=True)
