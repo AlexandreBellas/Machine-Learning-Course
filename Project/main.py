@@ -1,6 +1,8 @@
 from dataset import get_faces, enhance_data, save_faces
 from features import get_hog, get_dataset_hogs, save_hogs_dataset, read_hogs_dataset
-from classification import get_x_and_y
+from classification import get_x_and_y, get_best_knn, get_model_stats
+
+from sklearn.neighbors import KNeighborsClassifier
 
 from skimage import io
 
@@ -66,4 +68,12 @@ x, y = get_x_and_y(orl_hogs)
 # print("LEN Y", len(y))
 # print(y)
 
+print(x)
+# best_k = get_best_knn(x, y, "ORL")
+best_k = 1
+print("Melhor valor para k: ", best_k)
 
+best_knn = KNeighborsClassifier(n_neighbors=best_k)
+knn_description = "KNN com k = %s" % best_k
+
+get_model_stats(x, y, best_knn, knn_description, "ORL")
