@@ -1,6 +1,6 @@
 from dataset import get_faces, enhance_data, save_faces
-
 from features import get_hog, get_dataset_hogs, save_hogs_dataset, read_hogs_dataset
+from classification import get_x_and_y
 
 from skimage import io
 
@@ -57,3 +57,13 @@ else:
     save_hogs_dataset(orl_hogs, 'orl_hogs')
 
 print("True")
+
+
+# Get X and Y for a feature dataset
+x, y = get_x_and_y(orl_hogs)
+# print("LEN X: ", len(x))
+# print(x)
+# print("LEN Y", len(y))
+# print(y)
+
+
