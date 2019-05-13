@@ -1,8 +1,9 @@
 from dataset import get_faces, enhance_data, save_faces
 from features import get_hog, get_dataset_hogs, save_hogs_dataset, read_hogs_dataset
-from classification import get_x_and_y, get_best_knn, get_model_stats
+from classification import get_x_and_y, get_best_knn, get_model_stats, get_best_mlp
 
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 
 from skimage import io
 
@@ -73,7 +74,26 @@ print(x)
 best_k = 1
 print("Melhor valor para k: ", best_k)
 
-best_knn = KNeighborsClassifier(n_neighbors=best_k)
-knn_description = "KNN com k = %s" % best_k
+# best_knn = KNeighborsClassifier(n_neighbors=best_k)
+# knn_description = "KNN com k = %s" % best_k
+#
+# get_model_stats(x, y, best_knn, knn_description, "ORL")
 
-get_model_stats(x, y, best_knn, knn_description, "ORL")
+best_layers_cfg = get_best_mlp(x, y, "ORL")
+print("Best MLP:", best_layers_cfg)
+
+momentum = 0.4
+learning_rate = 0.001
+
+layers_cfg = [best_layers_cfg[0]]
+if best_layers_cfg[1] != 0:
+    layers_cfg.append(best_layers_cfg[1])
+
+
+best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=momentum, tol=1e-4, max_iter=1000, random_state=1, learning_rate='constant', learning_rate_init=learning_rate)
+
+print(best_mlp)
+
+
+mlp_description = "MLP: Layer 1 Size: %d, Layer 2 Size: %d" % (best_layers_cfg[0], best_layers_cfg[1])
+get_model_stats(x, y, best_mlp, mlp_description, "ORL")
