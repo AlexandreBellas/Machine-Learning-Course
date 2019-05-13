@@ -65,10 +65,16 @@ def get_hog(img, print_hog=False):
     @return: a slice containing the image hog feature
     """
 
-    fd, hog_image = hog(img, orientations=8, pixels_per_cell=(6, 6),
-                        cells_per_block=(2, 2), visualize=True, multichannel=False, block_norm='L2')
+    # Parameters
+    pixels_per_cell = (32,32)
+    orientations = 8
+    cell_per_block = (2,2)
+    block_norm = 'L2'
 
     if print_hog:
+        fd, hog_image = hog(img, orientations=orientations, pixels_per_cell=pixels_per_cell,
+                            cells_per_block=cell_per_block, visualize=True, multichannel=False, block_norm=block_norm)
+
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 
         ax1.axis('off')
@@ -82,5 +88,9 @@ def get_hog(img, print_hog=False):
         ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
         ax2.set_title('Histogram of Oriented Gradients')
         plt.show()
+
+    else:
+        fd = hog(img, orientations=orientations, pixels_per_cell=pixels_per_cell,
+                            cells_per_block=cell_per_block, visualize=False, multichannel=False, block_norm=block_norm)
 
     return fd
