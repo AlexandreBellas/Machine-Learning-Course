@@ -114,10 +114,11 @@ def get_best_mlp(x, y, database_name):
     :return: a slice [layer_1_size, layer_2_size, accuracy] containing the size of the layers the yielded the model
     with the best accuracy along with the best accuracy value
     """
+    # layer1_sizes = [20, 30]
     layer1_sizes = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-    momentum = 0.1
-    learning_rate = 0.001
+    momentum = 0.9
+    learning_rate = 0.1
 
     # Score to store the accuracy for each configuration
     scores = []
@@ -137,9 +138,10 @@ def get_best_mlp(x, y, database_name):
             x_train, x_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-            mlp = MLPClassifier(hidden_layer_sizes=(layer1_size), solver='sgd', momentum=momentum, tol=1e-4, max_iter=200, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
+            mlp = MLPClassifier(hidden_layer_sizes=(layer1_size), solver='sgd', momentum=momentum, tol=1e-4, max_iter=2000, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
             mlp.fit(x_train, y_train)
             accs.append(accuracy_score(y_test, mlp.predict(x_test)))
+
 
         acc = np.mean(accs)
         mlp1_accs.append(acc)
@@ -176,7 +178,7 @@ def get_best_mlp(x, y, database_name):
                 y_train, y_test = y[train_index], y[test_index]
 
                 mlp = MLPClassifier(hidden_layer_sizes=(layer1_size, layer2_size), solver='sgd', momentum=momentum, tol=1e-4,
-                                    max_iter=1000, random_state=1, learning_rate='adaptive',
+                                    max_iter=2000, random_state=1, learning_rate='adaptive',
                                     learning_rate_init=learning_rate)
                 mlp.fit(x_train, y_train)
                 accs.append(accuracy_score(y_test, mlp.predict(x_test)))

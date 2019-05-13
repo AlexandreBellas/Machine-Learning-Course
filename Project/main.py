@@ -47,8 +47,7 @@ else:
     save_hogs_dataset(orl_hogs, 'orl_hogs')
 
 
-x, y = get_x_and_y(orl_hogs)
-
+x, y = get_x_and_y(icmc_hogs)
 
 print("===================================== KNN  =====================================")
 
@@ -78,7 +77,7 @@ if best_layers_cfg[1] != 0:
     layers_cfg.append(best_layers_cfg[1])
 
 
-best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=momentum, tol=1e-4, max_iter=200, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
+best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=momentum, tol=1e-4, max_iter=2000, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
 mlp_description = "MLP: Layer 1 Size: %d, Layer 2 Size: %d" % (best_layers_cfg[0], best_layers_cfg[1])
 
 get_model_stats(x, y, best_mlp, mlp_description, "ORL")
