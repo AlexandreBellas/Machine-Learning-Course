@@ -12,6 +12,8 @@ from skimage import data, io, filters, exposure
 from skimage.util import random_noise, img_as_uint, invert
 from skimage.transform import rotate
 
+import random
+
 from sys import platform as sys_pf
 if sys_pf == 'darwin':
     import matplotlib
@@ -77,11 +79,12 @@ def enhance_data(dataset):
             img_inversed = np.invert(person[0])
             person.append(img_inversed)
 
-            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
-            img_rotated_backward = rotate(person[0], -40, mode='edge')
-            img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image', out_range='uint16')
-            img_rotated_backward = img_rotated_backward.astype(np.uint16)
-            person.append(img_rotated_backward)
+            # Rotation by a random number of degrees => needed to convert to uint16 type for saving in a file
+            angle = random.randint(-360, 360)
+            img_rotated = rotate(person[0], angle, mode='edge')
+            img_rotated = exposure.rescale_intensity(img_rotated, in_range='image', out_range='uint16')
+            img_rotated = img_rotated.astype(np.uint16)
+            person.append(img_rotated)
 
             # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
             # img_rotated_backward = rotate(person[0], 30, mode='edge')
@@ -107,12 +110,13 @@ def enhance_data(dataset):
             img_horizontal_flip = person[0][:, ::-1]    
             person.append(img_horizontal_flip)
 
-            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
-            img_rotated_backward = rotate(img_horizontal_flip, -20, mode='edge')
-            img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image',
+            # Rotation by a random number of degrees => needed to convert to uint16 type for saving in a file
+            angle = random.randint(-360, 360)
+            img_rotated = rotate(img_horizontal_flip, angle, mode='edge')
+            img_rotated = exposure.rescale_intensity(img_rotated, in_range='image',
                                                               out_range='uint16')
-            img_rotated_backward = img_rotated_backward.astype(np.uint16)
-            person.append(img_rotated_backward)
+            img_rotated = img_rotated.astype(np.uint16)
+            person.append(img_rotated)
 
             # Vertical flip
             # img_vertical_flip = person[0][::-1, :]

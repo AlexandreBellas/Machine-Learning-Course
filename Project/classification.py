@@ -42,7 +42,7 @@ def get_x_and_y(features_dataset):
         a y numpy array containing the corresponding target class
         [
             [0],
-            [0],
+            [1],
             ...
             [19]
         ]
@@ -70,14 +70,16 @@ def get_best_knn(x, y, database_name):
     """
 
     # Parameters to be tested
-    ks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    #ks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    #ks = [1]
+    ks = [3, 5, 7]
 
     # Use stratified K-fold to compute the accuracy for each model
     skf = StratifiedKFold(n_splits=10)
     knn_accs = []
 
     for k in ks:
-        print("Training with k = ", k)
+        print("Training with k =", k)
         accs = []
         for train_index, test_index in skf.split(x, y):
             x_train, x_test = x[train_index], x[test_index]
@@ -127,14 +129,20 @@ def get_best_mlp(x, y, database_name):
     # Use stratified K-fold to compute the accuracy for each model
     skf = StratifiedKFold(n_splits=10)
 
-    learning_rates = [0.01, 0.1, 1]
+    #learning_rates = [0.01, 0.1, 1]
+    learning_rates = [1.0]
     # learning_rates = [2]
+    
     momentums = [0.1, 0.5, 1]
+    #momentums = [1.0]
     # momentums = [1]
+    
     layer1_sizes = [10, 30, 50, 80, 100]
+    #layer1_sizes = [50]
     # layer1_sizes = [10, 80]
+    
     layer2_sizes = [0, 10, 30, 50, 80, 100]
-
+    #layer2_sizes = [0]
 
     # For each learning_rate and momentum, we'll generate a graphic showing how the accuracy varyies for different
     # layer 2 sizes given a layer 1 size
@@ -231,8 +239,8 @@ def get_model_stats(x, y, model, model_name, database_name):
     model_precision = np.mean(precision)
 
     print("Database: %s, Modelo: %s" % (database_name, model_name))
-    print("\tAcurácia: %.2f" % model_acc)
-    print("\tPrecisão: %.2f" % model_precision)
+    print("\tAcurácia: %.5f" % model_acc)
+    print("\tPrecisão: %.5f" % model_precision)
 
     plt.figure(figsize=(15,10))
     plt.title("Matriz de Confusão para o modelo %s e database %s" % (model_name, database_name), fontsize=16)
@@ -257,6 +265,6 @@ def get_PCA(x):
 
         if np.sum(pca.explained_variance_ratio_) > 0.5:
             print("PCA:")
-            print("\tDimensão: ", n_components)
+            print("\tDimensão:", n_components)
             print("\tVariância recuperada dos dados originais: %2.2f%%" % (np.sum(pca.explained_variance_ratio_)*100))
             return pca.transform(x)
