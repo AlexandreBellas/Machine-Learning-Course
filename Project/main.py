@@ -47,8 +47,8 @@ else:
     save_hogs_dataset(orl_hogs, 'orl_hogs')
 
 
-x, y = get_x_and_y(icmc_hogs)
-database_name = "ICMC"
+x, y = get_x_and_y(orl_hogs)
+database_name = "ORL"
 
 print("Dimensão Features Originais: ", len(x[0]))
 print("===================================== KNN  =====================================")
@@ -64,11 +64,11 @@ get_model_stats(x, y, best_knn, knn_description, database_name)
 
 
 print("===================================== MLP  =====================================")
-tolerance = 1e-2
+tolerance = 1e-1
 activation = 'logistic'
 
 best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = get_best_mlp(x, y, database_name)
-# best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = 0.1, 1.0, 80, 0, 0.72
+# best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = 1., 1.0, 50, 0, 0.81
 
 print("Melhor configuração para MLP")
 print("\tMelhor learning_rate: ", best_learning_rate)

@@ -189,7 +189,7 @@ def get_best_mlp(x, y, database_name):
 
     df = pd.DataFrame(data=scores, columns=['Learning Rate', 'Momentum', 'Layer 1 size', 'Layer 2 size', 'Accuracy'])
     # print(df)
-    df.to_csv("mlp_scores.csv")
+    df.to_csv("mlp_scores_%s.csv" % database_name)
 
     best_cfg = df.iloc[df['Accuracy'].idxmax()]
 
