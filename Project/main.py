@@ -48,24 +48,26 @@ else:
 
 
 x, y = get_x_and_y(icmc_hogs)
+database_name = "ICMC"
+
 print("Dimensão Features Originais: ", len(x[0]))
 print("===================================== KNN  =====================================")
 
-best_k, best_knn_acc = get_best_knn(x, y, "ORL")
+best_k, best_knn_acc = get_best_knn(x, y, database_name)
 # best_k = 1
 print("Melhor valor para k: %d com acurácia %2.2f" % (best_k, best_knn_acc*100))
 
 best_knn = KNeighborsClassifier(n_neighbors=best_k)
 knn_description = "KNN com k = %s" % best_k
 
-get_model_stats(x, y, best_knn, knn_description, "ORL")
+get_model_stats(x, y, best_knn, knn_description, database_name)
 
 
 print("===================================== MLP  =====================================")
 tolerance = 1e-2
 activation = 'logistic'
 
-best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = get_best_mlp(x, y, "ORL")
+best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = get_best_mlp(x, y, database_name)
 # best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = 0.1, 1.0, 80, 0, 0.72
 
 print("Melhor configuração para MLP")
@@ -87,11 +89,11 @@ best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=b
 mlp_description = "MLP: Learning Rate: %.4f, Momentum: %.2f, Layer 1 Size: %d, Layer 2 Size: %d" %\
                   (best_learning_rate, best_momentum, best_layer1_size, best_layer2_size)
 
-get_model_stats(x, y, best_mlp, mlp_description, "ORL")
+get_model_stats(x, y, best_mlp, mlp_description, database_name)
 
 print("===================================== PCA  =====================================")
 principal_components = get_PCA(x)
 
 
-get_model_stats(principal_components, y, best_knn, knn_description, "ORL PCA")
-get_model_stats(principal_components, y, best_mlp, mlp_description, "ORL PCA")
+get_model_stats(principal_components, y, best_knn, knn_description, database_name + " PCA")
+get_model_stats(principal_components, y, best_mlp, mlp_description, database_name + " PCA")

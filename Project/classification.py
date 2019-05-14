@@ -98,7 +98,7 @@ def get_best_knn(x, y, database_name):
     plt.xticks(ks)
     plt.grid(True)
     # plt.show(True)
-    plt.savefig("graphics/knn_accuracy.png")
+    plt.savefig("graphics/knn_accuracy_%s.png" % database_name)
 
     return ks[np.argmax(knn_accs)], np.max(knn_accs)
 
@@ -174,8 +174,8 @@ def get_best_mlp(x, y, database_name):
                 mlp_accs[layer1_description] = layer1_accs
 
             plt.figure(figsize=(15, 10))
-            plt.title("Variação da acurácia de um MLP com learning_rate = %.4f e momentum = %.2f"
-                      % (learning_rate, momentum), fontsize=16)
+            plt.title("Variação da acurácia de um MLP com learning_rate = %.4f e momentum = %.2f para database %s"
+                      % (learning_rate, momentum, database_name), fontsize=16)
             plt.xlabel("Tamanho da segunda camada", fontsize=12)
             plt.ylabel("Acurácia", fontsize=12)
 
@@ -185,7 +185,7 @@ def get_best_mlp(x, y, database_name):
             plt.legend()
             plt.grid(True)
             # plt.show(True)
-            plt.savefig("graphics/mlp_learning_%.4f_momentum_%.2f.png" % (learning_rate, momentum))
+            plt.savefig("graphics/mlp_learning_%.4f_momentum_%.2f_%s.png" % (learning_rate, momentum, database_name))
 
     df = pd.DataFrame(data=scores, columns=['Learning Rate', 'Momentum', 'Layer 1 size', 'Layer 2 size', 'Accuracy'])
     # print(df)

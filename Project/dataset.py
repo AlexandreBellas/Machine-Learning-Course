@@ -68,7 +68,7 @@ def enhance_data(dataset):
             # https://www.kaggle.com/tomahim/image-manipulation-augmentation-with-skimage
 
             # Noise insertion => needed to convert to uint16 type for saving in a file
-            img_noised = random_noise(person[0], mode='pepper', amount=0.2)
+            img_noised = random_noise(person[0], mode='pepper', amount=0.1)
             img_noised = exposure.rescale_intensity(img_noised, in_range='image', out_range='uint16')
             img_noised = img_noised.astype(np.uint16)
             person.append(img_noised)
@@ -77,20 +77,27 @@ def enhance_data(dataset):
             img_inversed = np.invert(person[0])
             person.append(img_inversed)
 
-            # Rotation by 20 degrees backward => needed to convert to uint16 type for saving in a file
-            img_rotated_backward = rotate(person[0], -20, mode='edge')
+            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
+            img_rotated_backward = rotate(person[0], -40, mode='edge')
             img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image', out_range='uint16')
             img_rotated_backward = img_rotated_backward.astype(np.uint16)
             person.append(img_rotated_backward)
 
+            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
+            # img_rotated_backward = rotate(person[0], 30, mode='edge')
+            # img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image',
+            #                                                   out_range='uint16')
+            # img_rotated_backward = img_rotated_backward.astype(np.uint16)
+            # person.append(img_rotated_backward)
+
+            # # Logarithmic correction
+            img_log_correction = exposure.adjust_log(person[0], gain=1.0)
+            person.append(img_log_correction)
+
             # Constrast changed
-            v_min, v_max = np.percentile(person[0], (0.1, 38.0))
+            v_min, v_max = np.percentile(person[0], (0.1, 60.0))
             img_better_constrast = exposure.rescale_intensity(person[0], in_range=(v_min, v_max))
             person.append(img_better_constrast)
-
-            # Logarithmic correction
-            img_log_correction = exposure.adjust_log(person[0], gain=1.1)
-            person.append(img_log_correction)
 
             # Sigmoid correction
             img_sigmoid_correction = exposure.adjust_sigmoid(person[0])
@@ -100,12 +107,19 @@ def enhance_data(dataset):
             img_horizontal_flip = person[0][:, ::-1]    
             person.append(img_horizontal_flip)
 
+            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
+            img_rotated_backward = rotate(img_horizontal_flip, -20, mode='edge')
+            img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image',
+                                                              out_range='uint16')
+            img_rotated_backward = img_rotated_backward.astype(np.uint16)
+            person.append(img_rotated_backward)
+
             # Vertical flip
-            img_vertical_flip = person[0][::-1, :]    
-            person.append(img_vertical_flip)    
+            # img_vertical_flip = person[0][::-1, :]
+            # person.append(img_vertical_flip)
 
             # Blur image => not working! There is a problem in the parameters of the function below...
-            img_blured = ndimage.uniform_filter(person[0], size=10)
+            img_blured = ndimage.uniform_filter(person[0], size=5)
             person.append(img_blured)
 
     return augmented_dataset
