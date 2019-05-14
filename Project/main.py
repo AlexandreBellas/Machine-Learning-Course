@@ -39,11 +39,11 @@ if read_from_file:
 
 else:
     print("Gerando novas HOG features")
-    icmc_hogs = get_dataset_hogs(augmented_icmc_faces, 'icmc_hogs')
+    icmc_hogs = get_dataset_hogs(augmented_icmc_faces, (32,32))
     save_hogs_dataset(icmc_hogs, 'icmc_hogs')
 
 
-    orl_hogs = get_dataset_hogs(orl_faces, 'orl_hogs')
+    orl_hogs = get_dataset_hogs(orl_faces, (12,12))
     save_hogs_dataset(orl_hogs, 'orl_hogs')
 
 print("=============================== TRAINING SECTION ===============================")
@@ -54,6 +54,7 @@ database = []
 
 x_orl, y_orl = get_x_and_y(orl_hogs)
 x_icmc, y_icmc = get_x_and_y(icmc_hogs)
+
 database_name_orl = "ORL"
 database_name_icmc = "ICMC FACES"
 
@@ -90,7 +91,6 @@ for x, y, database_name in zip(x_db, y_db, database):
 	activation = 'logistic'
 
 	best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = get_best_mlp(x, y, database_name)
-	# best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = 1., 1.0, 50, 0, 0.81
 
 	print("Melhor configuração para MLP")
 	print("\tMelhor learning_rate: ", best_learning_rate)

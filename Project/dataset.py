@@ -19,9 +19,6 @@ if sys_pf == 'darwin':
     import matplotlib
     matplotlib.use("TkAgg")
 
-
-import matplotlib.pyplot as plt
-
 def print_data():
     print("Hello from dataset")
 
@@ -66,9 +63,6 @@ def enhance_data(dataset):
     augmented_dataset = deepcopy(dataset)
     for person in augmented_dataset:
         while len(person) < 10:
-            # TODO Use better techniques of data augmentation
-            # https://www.kaggle.com/tomahim/image-manipulation-augmentation-with-skimage
-
             # Noise insertion => needed to convert to uint16 type for saving in a file
             img_noised = random_noise(person[0], mode='pepper', amount=0.1)
             img_noised = exposure.rescale_intensity(img_noised, in_range='image', out_range='uint16')
@@ -80,18 +74,11 @@ def enhance_data(dataset):
             person.append(img_inversed)
 
             # Rotation by a random number of degrees => needed to convert to uint16 type for saving in a file
-            angle = random.randint(-360, 360)
+            angle = random.randint(-40, 40)
             img_rotated = rotate(person[0], angle, mode='edge')
             img_rotated = exposure.rescale_intensity(img_rotated, in_range='image', out_range='uint16')
             img_rotated = img_rotated.astype(np.uint16)
             person.append(img_rotated)
-
-            # Rotation by 30 degrees backward => needed to convert to uint16 type for saving in a file
-            # img_rotated_backward = rotate(person[0], 30, mode='edge')
-            # img_rotated_backward = exposure.rescale_intensity(img_rotated_backward, in_range='image',
-            #                                                   out_range='uint16')
-            # img_rotated_backward = img_rotated_backward.astype(np.uint16)
-            # person.append(img_rotated_backward)
 
             # # Logarithmic correction
             img_log_correction = exposure.adjust_log(person[0], gain=1.0)
@@ -111,16 +98,12 @@ def enhance_data(dataset):
             person.append(img_horizontal_flip)
 
             # Rotation by a random number of degrees => needed to convert to uint16 type for saving in a file
-            angle = random.randint(-360, 360)
+            angle = random.randint(-40, 40)
             img_rotated = rotate(img_horizontal_flip, angle, mode='edge')
             img_rotated = exposure.rescale_intensity(img_rotated, in_range='image',
                                                               out_range='uint16')
             img_rotated = img_rotated.astype(np.uint16)
             person.append(img_rotated)
-
-            # Vertical flip
-            # img_vertical_flip = person[0][::-1, :]
-            # person.append(img_vertical_flip)
 
             # Blur image => not working! There is a problem in the parameters of the function below...
             img_blured = ndimage.uniform_filter(person[0], size=5)

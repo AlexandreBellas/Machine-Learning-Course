@@ -101,6 +101,7 @@ def get_best_knn(x, y, database_name):
     plt.grid(True)
     # plt.show(True)
     plt.savefig("graphics/knn_accuracy_%s.png" % database_name)
+    plt.close()
 
     return ks[np.argmax(knn_accs)], np.max(knn_accs)
 
@@ -129,20 +130,11 @@ def get_best_mlp(x, y, database_name):
     # Use stratified K-fold to compute the accuracy for each model
     skf = StratifiedKFold(n_splits=10)
 
-    #learning_rates = [0.01, 0.1, 1]
-    learning_rates = [1.0]
-    # learning_rates = [2]
-    
+    learning_rates = [0.01, 0.1, 1]
     momentums = [0.1, 0.5, 1]
-    #momentums = [1.0]
-    # momentums = [1]
-    
     layer1_sizes = [10, 30, 50, 80, 100]
-    #layer1_sizes = [50]
-    # layer1_sizes = [10, 80]
-    
-    layer2_sizes = [0, 10, 30, 50, 80, 100]
-    #layer2_sizes = [0]
+    # layer2_sizes = [0, 10, 50, 100]
+    layer2_sizes = [0]
 
     # For each learning_rate and momentum, we'll generate a graphic showing how the accuracy varyies for different
     # layer 2 sizes given a layer 1 size
@@ -194,6 +186,7 @@ def get_best_mlp(x, y, database_name):
             plt.grid(True)
             # plt.show(True)
             plt.savefig("graphics/mlp_learning_%.4f_momentum_%.2f_%s.png" % (learning_rate, momentum, database_name))
+            plt.close()
 
     df = pd.DataFrame(data=scores, columns=['Learning Rate', 'Momentum', 'Layer 1 size', 'Layer 2 size', 'Accuracy'])
     # print(df)
@@ -223,6 +216,8 @@ def get_model_stats(x, y, model, model_name, database_name):
 
     accs = []
     precision = []
+    y_pred_total = []
+    y_test_total = []
     for train_index, test_index in skf.split(x, y):
         x_train, x_test = x[train_index], x[test_index]
         y_train, y_test = y[train_index], y[test_index]
@@ -233,14 +228,20 @@ def get_model_stats(x, y, model, model_name, database_name):
         # Compute confusion matrix, accuracy and precision for this model
         model_cm += confusion_matrix(y_test, y_pred, classes_name)
         accs.append(accuracy_score(y_test, y_pred))
-        precision.append(precision_score(y_test, y_pred, average='micro'))
+
+        # Save all predictions and tests to compute the precision per class after all iterations.
+        # If the precision is compute for each fold, it might not have samples for some classes
+        y_pred_total = np.concatenate((y_pred_total, y_pred))
+        y_test_total = np.concatenate((y_test_total, y_test))
 
     model_acc = np.mean(accs)
-    model_precision = np.mean(precision)
+    model_precision = precision_score(y_test_total, y_pred_total, average=None)
 
     print("Database: %s, Modelo: %s" % (database_name, model_name))
     print("\tAcurácia: %.5f" % model_acc)
-    print("\tPrecisão: %.5f" % model_precision)
+    print("\tPrecisão:" % model_precision)
+    for class_id, precision in zip(range(len(model_precision)), model_precision):
+        print("\t\tClasse %d: %2.2f%%" % (class_id, precision*100))
 
     plt.figure(figsize=(15,10))
     plt.title("Matriz de Confusão para o modelo %s e database %s" % (model_name, database_name), fontsize=16)
@@ -249,6 +250,7 @@ def get_model_stats(x, y, model, model_name, database_name):
     # print(model_cm)
     # plt.show(True)
     plt.savefig("graphics/matriz_confusão_%s_%s.png" % (model_name, database_name))
+    plt.close()
 
 
 def get_PCA(x):
