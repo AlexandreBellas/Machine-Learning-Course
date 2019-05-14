@@ -48,7 +48,7 @@ else:
 
 
 x, y = get_x_and_y(icmc_hogs)
-
+print("Dimensão Features Originais: ", len(x[0]))
 print("===================================== KNN  =====================================")
 
 best_k, best_knn_acc = get_best_knn(x, y, "ORL")
@@ -62,23 +62,30 @@ get_model_stats(x, y, best_knn, knn_description, "ORL")
 
 
 print("===================================== MLP  =====================================")
+tolerance = 1e-2
+activation = 'logistic'
 
-print("TAMANHO FEATURES: ", len(x[0]))
+best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = get_best_mlp(x, y, "ORL")
+# best_learning_rate, best_momentum, best_layer1_size, best_layer2_size, best_acc = 0.1, 1.0, 80, 0, 0.72
 
-best_layers_cfg = get_best_mlp(x, y, "ORL")
-# best_layers_cfg = [20, 0, 0.96]
-print("Melhor configuração de Camadas:", best_layers_cfg)
-
-momentum = 0.9
-learning_rate = 0.1
-
-layers_cfg = [best_layers_cfg[0]]
-if best_layers_cfg[1] != 0:
-    layers_cfg.append(best_layers_cfg[1])
+print("Melhor configuração para MLP")
+print("\tMelhor learning_rate: ", best_learning_rate)
+print("\tMelhor momentum: ", best_momentum)
+print("\tMelhor layer 1 size: ", best_layer1_size)
+print("\tMelhor layer 2 size: ", best_layer2_size)
 
 
-best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=momentum, tol=1e-4, max_iter=2000, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
-mlp_description = "MLP: Layer 1 Size: %d, Layer 2 Size: %d" % (best_layers_cfg[0], best_layers_cfg[1])
+layers_cfg = [best_layer1_size]
+if best_layer2_size > 0:
+    layers_cfg.append(best_layer2_size)
+
+
+best_mlp = MLPClassifier(hidden_layer_sizes=layers_cfg, solver='sgd', momentum=best_momentum, tol=tolerance,
+                         max_iter=200, random_state=1, learning_rate='adaptive', learning_rate_init=best_learning_rate,
+                         activation=activation)
+
+mlp_description = "MLP: Learning Rate: %.4f, Momentum: %.2f, Layer 1 Size: %d, Layer 2 Size: %d" %\
+                  (best_learning_rate, best_momentum, best_layer1_size, best_layer2_size)
 
 get_model_stats(x, y, best_mlp, mlp_description, "ORL")
 

@@ -98,7 +98,7 @@ def get_best_knn(x, y, database_name):
     plt.xticks(ks)
     plt.grid(True)
     # plt.show(True)
-    plt.savefig("graphs/knn_accuracy.png")
+    plt.savefig("graphics/knn_accuracy.png")
 
     return ks[np.argmax(knn_accs)], np.max(knn_accs)
 
@@ -111,105 +111,89 @@ def get_best_mlp(x, y, database_name):
     :param y: the target vector
     :param database_name: name of the data base used to populate the x and y vectors. It's only used to print the
     graphics with the accuracy report
-    :return: a slice [layer_1_size, layer_2_size, accuracy] containing the size of the layers the yielded the model
-    with the best accuracy along with the best accuracy value
+    :return: the best learning_rate
+             the best momentum
+             the best layer 1 size
+             the best layer 2 size
+             the best achieved accuracy
     """
-    # layer1_sizes = [20, 30]
-    layer1_sizes = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
-    momentum = 0.9
-    learning_rate = 0.1
+    tolerance = 1e-1
+    activation = 'logistic'
 
     # Score to store the accuracy for each configuration
+    # Each line contains [learning_rate, momentum, layer_1_size, layer_2_size, accuracy]
     scores = []
 
-
-    # 1 layer MLP
     # Use stratified K-fold to compute the accuracy for each model
     skf = StratifiedKFold(n_splits=10)
-    mlp1_accs = []
 
-    for layer1_size in layer1_sizes:
-        model_description = "Layer 1 Size: %d" % layer1_size
-        print("training model: %s" % (model_description))
-
-        accs = []
-        for train_index, test_index in skf.split(x, y):
-            x_train, x_test = x[train_index], x[test_index]
-            y_train, y_test = y[train_index], y[test_index]
-
-            mlp = MLPClassifier(hidden_layer_sizes=(layer1_size), solver='sgd', momentum=momentum, tol=1e-4, max_iter=2000, random_state=1, learning_rate='adaptive', learning_rate_init=learning_rate)
-            mlp.fit(x_train, y_train)
-            accs.append(accuracy_score(y_test, mlp.predict(x_test)))
+    learning_rates = [0.01, 0.1, 1]
+    # learning_rates = [2]
+    momentums = [0.1, 0.5, 1]
+    # momentums = [1]
+    layer1_sizes = [10, 30, 50, 80, 100]
+    # layer1_sizes = [10, 80]
+    layer2_sizes = [0, 10, 30, 50, 80, 100]
 
 
-        acc = np.mean(accs)
-        mlp1_accs.append(acc)
-        scores.append([layer1_size, 0, acc])
+    # For each learning_rate and momentum, we'll generate a graphic showing how the accuracy varyies for different
+    # layer 2 sizes given a layer 1 size
+    for learning_rate in learning_rates:
+        for momentum in momentums:
+            mlp_accs = dict()
 
+            for layer1_size in layer1_sizes:
+                layer1_description = "Layer 1 Size: %d" % layer1_size
+                layer1_accs = []
 
-    plt.figure(figsize=(15,10))
-    plt.title("Variação da acurácia em relação ao tamanho da primeira camada para um MLP de uma camada", fontsize=16)
-    plt.xlabel("Tamanho da primeira camada", fontsize=12)
-    plt.ylabel("Acurácia", fontsize=12)
+                for layer2_size in layer2_sizes:
+                    print("training model: learning_rate: %.4f, momentum: %.2f, %s, Layer 2 Size: %d" %
+                          (learning_rate, momentum, layer1_description, layer2_size))
 
-    plt.grid(True)
-    plt.plot(layer1_sizes, mlp1_accs)
+                    # Accuracy for a fixed layer 1 size, varying the size of the second layer
+                    accs = []
+                    for train_index, test_index in skf.split(x, y):
+                        x_train, x_test = x[train_index], x[test_index]
+                        y_train, y_test = y[train_index], y[test_index]
 
-    # plt.show(True)
-    plt.savefig("graphs/mlp_1_layer_accs.png")
+                        hidden_layers = [layer1_size]
+                        if layer2_size > 0:
+                            hidden_layers.append(layer2_size)
 
-    ## 2 Layers MLP
-    layer1_sizes = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    layer2_sizes = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                        mlp = MLPClassifier(hidden_layer_sizes=hidden_layers, activation =activation, solver='sgd',
+                                            momentum=momentum, tol=tolerance, max_iter=200, random_state=1,
+                                            learning_rate='adaptive', learning_rate_init=learning_rate)
 
-    mlp2_accs = dict()
+                        mlp.fit(x_train, y_train)
+                        accs.append(accuracy_score(y_test, mlp.predict(x_test)))
 
-    for layer1_size in layer1_sizes:
-        model_description = "Layer 1 Size: %d" % layer1_size
-        layer1_accs = []
-        for layer2_size in layer2_sizes:
-            print("training model: %s, Layer 2 Size: %d" % (model_description, layer2_size))
+                    acc = np.mean(accs)
+                    layer1_accs.append(acc)
+                    scores.append([learning_rate, momentum, layer1_size, layer2_size, acc])
 
-            # Accuracy for a fixed layer 1 size, varying the size of the second layer
-            accs = []
-            for train_index, test_index in skf.split(x, y):
-                x_train, x_test = x[train_index], x[test_index]
-                y_train, y_test = y[train_index], y[test_index]
+                mlp_accs[layer1_description] = layer1_accs
 
-                mlp = MLPClassifier(hidden_layer_sizes=(layer1_size, layer2_size), solver='sgd', momentum=momentum, tol=1e-4,
-                                    max_iter=2000, random_state=1, learning_rate='adaptive',
-                                    learning_rate_init=learning_rate)
-                mlp.fit(x_train, y_train)
-                accs.append(accuracy_score(y_test, mlp.predict(x_test)))
+            plt.figure(figsize=(15, 10))
+            plt.title("Variação da acurácia de um MLP com learning_rate = %.4f e momentum = %.2f"
+                      % (learning_rate, momentum), fontsize=16)
+            plt.xlabel("Tamanho da segunda camada", fontsize=12)
+            plt.ylabel("Acurácia", fontsize=12)
 
-            acc = np.mean(accs)
-            layer1_accs.append(acc)
-            scores.append([layer1_size, layer2_size, acc])
+            for layer_1_description, accs in mlp_accs.items():
+                plt.plot(layer2_sizes, accs, label=layer_1_description)
 
-        mlp2_accs[model_description] = layer1_accs
+            plt.legend()
+            plt.grid(True)
+            # plt.show(True)
+            plt.savefig("graphics/mlp_learning_%.4f_momentum_%.2f.png" % (learning_rate, momentum))
 
-
-    plt.figure(figsize=(15, 10))
-    plt.title("Variação da acurácia em relação ao tamanho da segunda camada para um MLP de duas camadas", fontsize=16)
-    plt.xlabel("Tamanho da segunda camada", fontsize=12)
-    plt.ylabel("Acurácia", fontsize=12)
-
-    for model_description, accs in mlp2_accs.items():
-        plt.plot(layer2_sizes, accs, label=model_description)
-
-    plt.legend()
-    plt.grid(True)
-    # plt.show(True)
-    plt.savefig("graphs/mlp_2_layers_accs_new.png")
-
-    df = pd.DataFrame(data=scores, columns=['Layer 1 size', 'Layer 2 size', 'Accuracy'])
+    df = pd.DataFrame(data=scores, columns=['Learning Rate', 'Momentum', 'Layer 1 size', 'Layer 2 size', 'Accuracy'])
     # print(df)
     df.to_csv("mlp_scores.csv")
 
     best_cfg = df.iloc[df['Accuracy'].idxmax()]
 
-    return [int(best_cfg[0]), int(best_cfg[1]), best_cfg[2]]
+    return best_cfg[0], best_cfg[1], int(best_cfg[2]), int(best_cfg[3]), best_cfg[4]
 
 def get_model_stats(x, y, model, model_name, database_name):
     """
@@ -256,7 +240,7 @@ def get_model_stats(x, y, model, model_name, database_name):
     ax.set(xlabel='Classe Predita', ylabel='Verdadeira Classe')
     # print(model_cm)
     # plt.show(True)
-    plt.savefig("graphs/matriz_confusão_%s_%s" % (model_name, database_name))
+    plt.savefig("graphics/matriz_confusão_%s_%s.png" % (model_name, database_name))
 
 
 def get_PCA(x):
