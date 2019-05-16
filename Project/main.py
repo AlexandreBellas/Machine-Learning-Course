@@ -77,7 +77,6 @@ for x, y, database_name in zip(x_db, y_db, database):
 
 
 	best_k, best_knn_acc = get_best_knn(x, y, database_name)
-	# best_k = 1
 	print("Melhor valor para k: %d com acurácia %2.2f%%" % (best_k, best_knn_acc*100))
 
 	best_knn = KNeighborsClassifier(n_neighbors=best_k)

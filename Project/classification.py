@@ -70,8 +70,6 @@ def get_best_knn(x, y, database_name):
     """
 
     # Parameters to be tested
-    #ks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    #ks = [1]
     ks = [3, 5, 7]
 
     # Use stratified K-fold to compute the accuracy for each model
@@ -99,7 +97,6 @@ def get_best_knn(x, y, database_name):
     plt.xlabel("K", fontsize=12)
     plt.xticks(ks)
     plt.grid(True)
-    # plt.show(True)
     plt.savefig("graphics/knn_accuracy_%s.png" % database_name)
     plt.close()
 
@@ -133,7 +130,6 @@ def get_best_mlp(x, y, database_name):
     learning_rates = [0.01, 0.1, 1]
     momentums = [0.1, 0.5, 1]
     layer1_sizes = [10, 30, 50, 80, 100]
-    # layer2_sizes = [0, 10, 50, 100]
     layer2_sizes = [0]
 
     # For each learning_rate and momentum, we'll generate a graphic showing how the accuracy varyies for different
@@ -184,12 +180,10 @@ def get_best_mlp(x, y, database_name):
 
             plt.legend()
             plt.grid(True)
-            # plt.show(True)
             plt.savefig("graphics/mlp_learning_%.4f_momentum_%.2f_%s.png" % (learning_rate, momentum, database_name))
             plt.close()
 
     df = pd.DataFrame(data=scores, columns=['Learning Rate', 'Momentum', 'Layer 1 size', 'Layer 2 size', 'Accuracy'])
-    # print(df)
     df.to_csv("mlp_scores_%s.csv" % database_name)
 
     best_cfg = df.iloc[df['Accuracy'].idxmax()]
@@ -247,8 +241,6 @@ def get_model_stats(x, y, model, model_name, database_name):
     plt.title("Matriz de Confusão para o modelo %s e database %s" % (model_name, database_name), fontsize=16)
     ax = sns.heatmap(model_cm, annot=True, cbar=False)
     ax.set(xlabel='Classe Predita', ylabel='Verdadeira Classe')
-    # print(model_cm)
-    # plt.show(True)
     plt.savefig("graphics/matriz_confusão_%s_%s.png" % (model_name, database_name))
     plt.close()
 
