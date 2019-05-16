@@ -130,7 +130,7 @@ def get_best_mlp(x, y, database_name):
     learning_rates = [0.01, 0.1, 1]
     momentums = [0.1, 0.5, 1]
     layer1_sizes = [10, 30, 50, 80, 100]
-    layer2_sizes = [0]
+    layer2_sizes = [0, 10, 50, 100]
 
     # For each learning_rate and momentum, we'll generate a graphic showing how the accuracy varyies for different
     # layer 2 sizes given a layer 1 size
