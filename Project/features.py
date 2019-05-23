@@ -9,10 +9,11 @@ from skimage import data, exposure
 import numpy as np
 
 
-def get_dataset_hogs(dataset):
+def get_dataset_hogs(dataset, pixels_per_cell):
     """
     get_dataset_hogs gets the hog feature for each image in the dataset
     :param dataset: the data set to be used. It must have the structure
+    :param pixels_per_cell: cell size to compute the hog
         [
             [person_1_face1, person_1_face2, person_1_face3],
             [person_2_face1, person_2_face2, person_2_face3],
@@ -27,7 +28,7 @@ def get_dataset_hogs(dataset):
 
         ]
     """
-    return [[get_hog(img) for img in person] for person in dataset]
+    return [[get_hog(img, pixels_per_cell) for img in person] for person in dataset]
 
 
 def save_hogs_dataset(dataset, file):
@@ -58,17 +59,23 @@ def read_hogs_dataset(file):
     """
     return np.load(file)
 
-def get_hog(img, print_hog=False):
+def get_hog(img, pixels_per_cell, print_hog=False):
     """
     get_hog returns the hog feature for the given image
     @param img: the image to extract the hog feature
+    @param pixels_per_cell: cell size to compute the hog
     @return: a slice containing the image hog feature
     """
 
-    fd, hog_image = hog(img, orientations=8, pixels_per_cell=(6, 6),
-                        cells_per_block=(2, 2), visualize=True, multichannel=False, block_norm='L2')
+    # Parameters
+    orientations = 8
+    cell_per_block = (2,2)
+    block_norm = 'L2'
 
     if print_hog:
+        fd, hog_image = hog(img, orientations=orientations, pixels_per_cell=pixels_per_cell,
+                            cells_per_block=cell_per_block, visualize=True, multichannel=False, block_norm=block_norm)
+
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 
         ax1.axis('off')
@@ -82,5 +89,9 @@ def get_hog(img, print_hog=False):
         ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
         ax2.set_title('Histogram of Oriented Gradients')
         plt.show()
+
+    else:
+        fd = hog(img, orientations=orientations, pixels_per_cell=pixels_per_cell,
+                            cells_per_block=cell_per_block, visualize=False, multichannel=False, block_norm=block_norm)
 
     return fd
